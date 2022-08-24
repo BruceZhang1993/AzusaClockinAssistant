@@ -26,6 +26,15 @@ def find_all_method(obj):
     return methods
 
 
+async def gather_with_concurrency(n, *tasks):
+    semaphore = asyncio.Semaphore(n)
+
+    async def sem_task(task):
+        async with semaphore:
+            await task
+    await asyncio.gather(*(sem_task(task) for task in tasks))
+
+
 async def main():
     tasks = set()
     for cls in find_all_class():
@@ -35,7 +44,7 @@ async def main():
             task.add_done_callback(tasks.discard)
             tasks.add(task)
     while len(tasks) != 0:
-        await asyncio.gather(*[t for _, t in enumerate(itertools.islice(tasks, 10))])
+        await gather_with_concurrency(10, *tasks)
 
 
 def start():
