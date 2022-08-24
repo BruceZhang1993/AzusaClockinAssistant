@@ -49,6 +49,18 @@ class Bilibili(BaseInterface):
             return data.get('code') == 0, data.get('msg')
 
     @clockin_method
+    async def daily_share(self):
+        """每日分享"""
+        if self.cookie == '':
+            return False, '未配置 Cookie'
+        async with self.client.post('https://api.bilibili.com/x/web-interface/share/add', data={
+            'aid': 716386834,
+            'csrf': self._get_bilijct(),
+        }) as resp:
+            data = await resp.json()
+            return data.get('code') == 0, data.get('message')
+
+    @clockin_method
     async def vip_gifts(self):
         """大会员兑换福利"""
         if self.cookie == '':
