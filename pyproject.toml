@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "azusaclockinassistant"
+version = "0.1.0"
+description = ""
+authors = ["Bruce Zhang <zttt183525594@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+click = "*"
+loguru = "*"
+aiohttp = "*"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
