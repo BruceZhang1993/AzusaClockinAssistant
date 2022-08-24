@@ -31,6 +31,8 @@ class Bilibili(BaseInterface):
     @clockin_method
     async def live_clockin(self):
         """直播用户签到"""
+        if self.cookie == '':
+            return False, '未配置 Cookie'
         async with self.client.get('https://api.live.bilibili.com/xlive/web-ucenter/v1/sign/DoSign') as resp:
             data = await resp.json()
             return data.get('code') == 0, data.get('message')
@@ -38,6 +40,8 @@ class Bilibili(BaseInterface):
     @clockin_method
     async def manga_clockin(self):
         """漫画区签到"""
+        if self.cookie == '':
+            return False, '未配置 Cookie'
         async with self.client.post('https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn', data={
             'platform': 'android',
         }) as resp:
@@ -47,6 +51,8 @@ class Bilibili(BaseInterface):
     @clockin_method
     async def vip_gifts(self):
         """大会员兑换福利"""
+        if self.cookie == '':
+            return False, '未配置 Cookie'
         async with self.client.get('https://api.bilibili.com/x/vip/privilege/my') as resp:
             data = await resp.json()
             if data.get('code') != 0:
