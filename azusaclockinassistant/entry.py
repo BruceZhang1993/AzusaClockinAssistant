@@ -4,14 +4,14 @@ import pkgutil
 import importlib
 import inspect
 
-from azusa_clockin_assistant.common.base import BaseInterface
-from azusa_clockin_assistant.common.decorators import clockin_method
+from azusaclockinassistant.common.base import BaseInterface
+from azusaclockinassistant.common.decorators import clockin_method
 
 
 def find_all_class():
     classes = []
-    for _, name, _ in pkgutil.iter_modules(['interface']):
-        module = importlib.import_module(f'.{name}', 'azusa_clockin_assistant.interface')
+    for _, name, _ in pkgutil.iter_modules(['azusaclockinassistant/interface']):
+        module = importlib.import_module(f'.{name}', 'azusaclockinassistant.interface')
         for _, member in inspect.getmembers(module):
             if inspect.isclass(member) and member != BaseInterface and issubclass(member, BaseInterface):
                 classes.append(member)
@@ -38,5 +38,5 @@ async def main():
         await asyncio.gather(*[t for _, t in enumerate(itertools.islice(tasks, 10))])
 
 
-if __name__ == '__main__':
+def start():
     asyncio.run(main())

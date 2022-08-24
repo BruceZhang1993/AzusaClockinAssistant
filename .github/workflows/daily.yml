@@ -1,0 +1,24 @@
+name: "Daily clockin"
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+
+env:
+  BILIBILI_COOKIE: ${{ secrets.BILIBILI_COOKIE }}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: "1.1.14"
+      - name: Install dependencies
+        run: poetry install
+      - name: Run daily clockin
+        run: poetry run azusa_clockin_assistant

@@ -2,8 +2,8 @@ import os
 
 import click
 
-from azusa_clockin_assistant.common.base import BaseInterface
-from azusa_clockin_assistant.common.decorators import clockin_method
+from azusaclockinassistant.common.base import BaseInterface
+from azusaclockinassistant.common.decorators import clockin_method
 
 
 class Bilibili(BaseInterface):
