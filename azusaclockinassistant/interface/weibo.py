@@ -20,6 +20,7 @@ class Weibo(BaseInterface):
 
     @clockin_method
     async def super_index_sign(self):
+        """微博超话签到"""
         if self.cookie == '':
             return False, '未配置 Cookie'
         for id_ in self.super_indexes:
@@ -33,7 +34,6 @@ class Weibo(BaseInterface):
         return True, '执行完成'
 
     async def _super_index_clockin(self, id_):
-        """微博超话签到"""
         async with self.client.get('https://weibo.com/p/aj/general/button', params={
             'ajwvr': '6',
             'api': 'http://i.huati.weibo.com/aj/super/checkin',
