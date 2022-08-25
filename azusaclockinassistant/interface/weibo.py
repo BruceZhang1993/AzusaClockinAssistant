@@ -50,5 +50,4 @@ class Weibo(BaseInterface):
             '__rnd': str(int(round(time.time() * 1000))),
         }) as resp:
             data = await resp.json()
-            print(data)
-            return data.get('code') == 0, data.get('msg')
+            return data.get('code') == '100000', data.get('msg')
