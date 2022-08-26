@@ -1,9 +1,12 @@
+import asyncio
 import hashlib
 import os
 import random
 import string
 import time
 import uuid
+
+import click
 
 from azusaclockinassistant.common.base import BaseInterface
 from azusaclockinassistant.common.decorators import clockin_method
@@ -22,7 +25,7 @@ class Mihoyo(BaseInterface):
             'Cookie': self.cookie,
             'x-rpc-device_id': str(uuid.uuid3(uuid.NAMESPACE_URL, self.cookie)),
             'User-Agent': f'Mozilla/5.0 (Linux; Android 12; Unspecified Device) AppleWebKit/537.36 (KHTML, like Gecko) '
-                          f'Version/4.0 Chrome/103.0.5060.129 Mobile Safari/537.36 miHoYoBBS/2.35.2',
+                          'Version/4.0 Chrome/103.0.5060.129 Mobile Safari/537.36 miHoYoBBS/2.35.2',
         })
         super(Mihoyo, self).__init__()
 
@@ -36,12 +39,53 @@ class Mihoyo(BaseInterface):
         c = md5.hexdigest()
         return f"{i},{r},{c}"
 
-    # @clockin_method
+    async def _get_genshiin_accounts(self):
+        async with self.client.get(f'{self.WEBAPI}/binding/api/getUserGameRolesByCookie', params={
+            'game_biz': 'hk4e_cn',
+        }) as resp:
+            data = await resp.json()
+            if data.get('retcode') != 0:
+                return []
+            return [(account.get('region'), account.get('game_uid'), account.get('nickname'))
+                    for account in data.get('data', {}).get('list', [])]
+
+    async def _sign_in(self, region, uid, name, tries=1):
+        click.echo(f'正在尝试签到账号 {name} 第{tries}次尝试...')
+        async with self.client.post(f'{self.WEBAPI}/event/bbs_sign_reward/sign', json={
+            'act_id': self.GENSHIIN_ACT_ID,
+            'region': region,
+            'uid': uid,
+        }) as resp:
+            data = await resp.json()
+            print(data)
+            if data.get('retcode') == 0 and data.get('data', {}).get('success') == 1 \
+                    and tries <= 4:
+                await asyncio.sleep(random.randint(4, 10))
+                await self._sign_in(region, uid, name, tries + 1)
+            elif data.get('retcode') != 0 and tries <= 4:
+                await asyncio.sleep(random.randint(4, 10))
+                await self._sign_in(region, uid, name, tries + 1)
+
+    @clockin_method
     async def genshiin_clockin(self):
         """原神签到"""
         if self.cookie == '':
             return False, '未配置 Cookie'
-        async with self.client.get(f'{self.WEBAPI}/event/bbs_sign_reward/home?act_id={self.GENSHIIN_ACT_ID}') as resp:
-            data = await resp.json()
-            print(data)
-            return True, 'OK'
+        for region, uid, name in await self._get_genshiin_accounts():
+            async with self.client.get(f'{self.WEBAPI}/event/bbs_sign_reward/info', params={
+                'act_id': self.GENSHIIN_ACT_ID,
+                'region': region,
+                'uid': uid,
+            }) as resp:
+                data = await resp.json()
+                if data.get('retcode') != 0:
+                    continue
+                if data.get('data', {}).get('first_bind'):
+                    click.echo(f'旅行者 {name} 是第一次绑定米游社，请先手动签到一次')
+                    continue
+                is_sign = '未签到' if data.get('data', {}).get('is_sign') is False else '已签到'
+                click.echo(f'查询到旅行者 {name} {is_sign}...')
+                if is_sign == '未签到':
+                    await asyncio.sleep(random.randint(2, 8))
+                    await self._sign_in(region, uid, name)
+        return True, '执行结束'
