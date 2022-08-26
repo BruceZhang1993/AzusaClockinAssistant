@@ -40,8 +40,7 @@ async def main():
     for cls in find_all_class():
         o = cls()
         for method in find_all_method(o):
-            task = asyncio.create_task(method())
-            task.add_done_callback(tasks.discard)
+            task = method()
             tasks.add(task)
     while len(tasks) != 0:
         await gather_with_concurrency(10, *tasks)
