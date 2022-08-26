@@ -42,8 +42,7 @@ async def main():
         for method in find_all_method(o):
             task = method()
             tasks.add(task)
-    while len(tasks) != 0:
-        await gather_with_concurrency(10, *tasks)
+    await gather_with_concurrency(10, *tasks)
 
 
 def start():
