@@ -31,7 +31,10 @@ async def gather_with_concurrency(n, *tasks):
 
     async def sem_task(task):
         async with semaphore:
-            await task
+            try:
+                await task
+            except Exception as e:
+                print(f'{task.__name__} 异常 {str(e)}')
     await asyncio.gather(*(sem_task(task) for task in tasks))
 
 
