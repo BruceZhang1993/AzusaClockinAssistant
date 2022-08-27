@@ -34,7 +34,7 @@ async def gather_with_concurrency(n, *tasks):
             try:
                 await task
             except Exception as e:
-                print(f'{task.__name__} 异常 {str(e)}')
+                print(f'{task.__name__} 异常 {str(e)} 即将重试')
     await asyncio.gather(*(sem_task(task) for task in tasks))
 
 

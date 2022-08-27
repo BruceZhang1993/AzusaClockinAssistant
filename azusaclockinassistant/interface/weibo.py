@@ -15,6 +15,8 @@ class Weibo(BaseInterface):
         self.headers.update({
             'Cookie': self.cookie,
             'Referer': 'https://weibo.com',
+            'client-version': 'v2.34.91',
+            'server-version': 'v2022.08.26.2',
         })
         super(Weibo, self).__init__()
 
@@ -44,10 +46,15 @@ class Weibo(BaseInterface):
             'location': 'page_100808_super_index',
             'timezone': 'GMT+0800',
             'lang': 'zh-cn',
-            'plat': 'Linux x86_64',
+            'plat': 'Win32',
             'ua': self.BROWSER_UA,
             'screen': '1920*1080',
             '__rnd': str(int(round(time.time() * 1000))),
+        }, headers={
+            'Referer': f'https://weibo.com/p/{id_}/super_index',
+            'x-requested-with': 'XMLHttpRequest',
         }) as resp:
+            if 'json' not in resp.content_type:
+                return False, '响应格式非JSON'
             data = await resp.json()
             return data.get('code') == '100000', data.get('msg')
