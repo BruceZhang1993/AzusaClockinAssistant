@@ -24,14 +24,14 @@ class Mihoyo(BaseInterface):
             'Referer': 'https://webstatic.mihoyo.com/bbs/event/signin-ys/index.html',
             'Cookie': self.cookie,
             'x-rpc-device_id': str(uuid.uuid3(uuid.NAMESPACE_URL, self.cookie)),
-            'User-Agent': f'Mozilla/5.0 (Linux; Android 12; Unspecified Device) AppleWebKit/537.36 (KHTML, like Gecko) '
-                          'Version/4.0 Chrome/103.0.5060.129 Mobile Safari/537.36 miHoYoBBS/2.35.2',
+            'User-Agent': f'Mozilla/5.0 (Linux; Android 12; PGKM10) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          f'Chrome/104.0.0.0 Mobile Safari/537.36 miHoYoBBS/2.36.1',
         })
         super(Mihoyo, self).__init__()
 
     @staticmethod
     def _get_web_ds():
-        n = 'N50pqm7FSy2AkFz2B3TqtuZMJ5TOl3Ep'
+        n = 'YVEIkzDFNHLeKXLxzqCA9TzxCpWwbIbk'
         i = str(int(time.time()))
         r = ''.join(random.sample(string.ascii_lowercase + string.digits, 6))
         md5 = hashlib.md5()
